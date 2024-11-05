@@ -1,0 +1,8 @@
+{
+    "name": "Rust and C++",
+    "image": "mcr.microsoft.com/devcontainers/cpp:0-ubuntu-20.04",
+    "features": {
+        "ghcr.io/devcontainers/features/rust:1": {}
+    },
+    "postCreateCommand": "cargo build --release"
+}
