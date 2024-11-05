@@ -1,22 +1,21 @@
 #include <iostream>
-#include <windows.h>
-#include "bindings.h"
+#include <dlfcn.h>
 
-typedef int (__cdecl *add_func)(int, int);
+typedef int (*add_func)(int, int);
 
 int main() {
     // Load the shared library
-    HMODULE handle = LoadLibrary(TEXT("rust_cpp_example.dll"));
+    void* handle = dlopen("./target/release/librust_cpp_example.so", RTLD_LAZY);
     if (!handle) {
-        std::cerr << "Unable to load library: " << GetLastError() << std::endl;
+        std::cerr << "Unable to load library: " << dlerror() << std::endl;
         return 1;
     }
 
     // Get the function from the library
-    add_func add = (add_func)GetProcAddress(handle, "add");
+    add_func add = (add_func)dlsym(handle, "add");
     if (!add) {
-        std::cerr << "Unable to find function: " << GetLastError() << std::endl;
-        FreeLibrary(handle);
+        std::cerr << "Unable to find function: " << dlerror() << std::endl;
+        dlclose(handle);
         return 1;
     }
 
@@ -25,6 +24,6 @@ int main() {
     std::cout << "Result of add(3, 4): " << result << std::endl;
 
     // Close the library
-    FreeLibrary(handle);
+    dlclose(handle);
     return 0;
 }
